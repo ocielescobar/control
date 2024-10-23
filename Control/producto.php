@@ -36,16 +36,27 @@
 		$quantity=intval($_POST['quantity_remove']);
 		$reference=mysqli_real_escape_string($con,(strip_tags($_POST["reference_remove"],ENT_QUOTES)));
 		$id_producto=intval($_GET['id']);
-		$user_id=$_SESSION['user_id'];
-		$firstname=$_SESSION['firstname'];
-		$nota="$firstname eliminó $quantity producto(s) del inventario";
-		$fecha=date("Y-m-d H:i:s");
-		guardar_historial($id_producto,$user_id,$fecha,$nota,$reference,$quantity);
-		$update=eliminar_stock($id_producto,$quantity);
-		if ($update==1){
-			$message=1;
+				
+		// Verifica el stock actual del producto
+		$query_stock = mysqli_query($con, "SELECT stock FROM products WHERE id_producto='$id_producto'");
+		$row_stock = mysqli_fetch_array($query_stock);
+		$stock_actual = intval($row_stock['stock']);
+		
+		// Comprobar si hay suficiente stock para eliminar
+		if ($quantity > $stock_actual) {
+			$error = "No se puede eliminar más stock del disponible.";
 		} else {
-			$error=1;
+			$user_id = $_SESSION['user_id'];
+			$firstname = $_SESSION['firstname'];
+			$nota = "$firstname eliminó $quantity producto(s) del inventario";
+			$fecha = date("Y-m-d H:i:s");
+			guardar_historial($id_producto, $user_id, $fecha, $nota, $reference, $quantity);
+			$update = eliminar_stock($id_producto, $quantity);
+			if ($update == 1) {
+				$message = 1;
+			} else {
+				$error = 1;
+			}
 		}
 	}
 	

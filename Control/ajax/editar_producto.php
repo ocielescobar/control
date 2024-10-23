@@ -28,30 +28,16 @@
 		$stock=intval($_POST['mod_stock']);
 		$precio_venta=floatval($_POST['mod_precio']);
 		$id_producto=$_POST['mod_id'];
-		// Obtener el stock actual del producto
-		$query_stock = mysqli_query($con, "SELECT stock FROM products WHERE id_producto='$id_producto'");
-		$row_stock = mysqli_fetch_array($query_stock);
-		$stock_actual = $row_stock['stock'];
-	
-		// Validar si el nuevo stock es negativo
-		if ($stock < 0) {
-			$errors[] = "El stock no puede ser un valor negativo.";
-		} else if ($stock > $stock_actual) {
-			// Si deseas restringir que no se pueda aumentar el stock de manera arbitraria
-			$errors[] = "El nuevo stock no puede ser mayor que el stock actual.";
-		} else {
-			// Actualizar producto
-			$sql = "UPDATE products SET codigo_producto='$codigo', nombre_producto='$nombre', id_categoria='$categoria', precio_producto='$precio_venta', stock='$stock' WHERE id_producto='$id_producto'";
-			$query_update = mysqli_query($con, $sql);
-			if ($query_update) {
+		$sql="UPDATE products SET codigo_producto='".$codigo."', nombre_producto='".$nombre."', id_categoria='".$categoria."', precio_producto='".$precio_venta."', stock='".$stock."' WHERE id_producto='".$id_producto."'";
+		$query_update = mysqli_query($con,$sql);
+			if ($query_update){
 				$messages[] = "Producto ha sido actualizado satisfactoriamente.";
-			} else {
-				$errors[] = "Lo siento, algo ha salido mal. Intenta nuevamente." . mysqli_error($con);
+			} else{
+				$errors []= "Lo siento algo ha salido mal intenta nuevamente.".mysqli_error($con);
 			}
+		} else {
+			$errors []= "Error desconocido.";
 		}
-	} else {
-		$errors[] = "Error desconocido.";
-	}
 		
 		if (isset($errors)){
 			
